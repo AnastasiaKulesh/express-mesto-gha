@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
+    "dev": "nodemon --inspect app.js",
     "lint": "npx eslint"
   },
   "keywords": [],
   "author": "Anastasia Kulesh",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
