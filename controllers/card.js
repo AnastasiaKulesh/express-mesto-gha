@@ -25,6 +25,7 @@ module.exports.createCard = async (req, res) => {
         .status(400)
         .send({ message: 'Переданы неверные данные', error: error.message });
     }
+
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
@@ -44,9 +45,7 @@ module.exports.deleteCard = async (req, res) => {
         .status(404)
         .send({ message: 'Карточка по указанному ID не найдена' });
     }
-    if (error.name === 'CastError') {
-      return res.status(400).send({ message: 'Передан неверный ID' });
-    }
+
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
@@ -70,6 +69,11 @@ module.exports.setLike = async (req, res) => {
         .status(404)
         .send({ message: 'Карточка по указанному ID не найдена' });
     }
+
+    if (error.name === 'CastError') {
+      return res.status(400).send({ message: 'Передан неверный ID' });
+    }
+
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
@@ -93,6 +97,11 @@ module.exports.deleteLike = async (req, res) => {
         .status(404)
         .send({ message: 'Карточка по указанному ID не найдена' });
     }
+
+    if (error.name === 'CastError') {
+      return res.status(400).send({ message: 'Передан неверный ID' });
+    }
+
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
