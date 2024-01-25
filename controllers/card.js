@@ -61,14 +61,14 @@ module.exports.setLike = async (req, res) => {
       cardId,
       { $addToSet: { likes: userId } },
       { new: true },
-    );
+    ).orFail(() => new Error('NotFoundError'));
 
     return res.status(200).send(like);
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.message === 'NotFoundError') {
       return res
-        .status(400)
-        .send({ message: 'Переданы неверные данные', error: error.message });
+        .status(404)
+        .send({ message: 'Карточка по указанному ID не найдена' });
     }
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
@@ -84,14 +84,14 @@ module.exports.deleteLike = async (req, res) => {
       cardId,
       { $pull: { likes: userId } },
       { new: true },
-    );
+    ).orFail(() => new Error('NotFoundError'));
 
     return res.status(200).send(like);
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.message === 'NotFoundError') {
       return res
-        .status(400)
-        .send({ message: 'Переданы неверные данные', error: error.message });
+        .status(404)
+        .send({ message: 'Карточка по указанному ID не найдена' });
     }
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
