@@ -50,3 +50,49 @@ module.exports.deleteCard = async (req, res) => {
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
+
+// Поставить лайк карточке
+module.exports.setLike = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { cardId } = req.params;
+
+    const like = await Card.findByIdAndUpdate(
+      cardId,
+      { $addToSet: { likes: userId } },
+      { new: true },
+    );
+
+    return res.status(200).send(like);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res
+        .status(400)
+        .send({ message: 'Переданы неверные данные', error: error.message });
+    }
+    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+  }
+};
+
+// Убрать лайк с карточки
+module.exports.deleteLike = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { cardId } = req.params;
+
+    const like = await Card.findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: userId } },
+      { new: true },
+    );
+
+    return res.status(200).send(like);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res
+        .status(400)
+        .send({ message: 'Переданы неверные данные', error: error.message });
+    }
+    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+  }
+};
