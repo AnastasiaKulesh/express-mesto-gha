@@ -49,3 +49,59 @@ module.exports.createUser = async (req, res) => {
     return res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
+
+// Обновить профиль пользователя
+module.exports.updateProfile = async (req, res) => {
+  try {
+    const { name, about } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name, about },
+      { new: true, runValidators: true },
+    ).orFail(() => new Error('NotFoundError'));
+
+    return res.status(200).send(user);
+  } catch (error) {
+    if (error.message === 'NotFoundError') {
+      return res
+        .status(404)
+        .send({ message: 'Пользователь по указанному ID не найден' });
+    }
+    if (error.name === 'ValidationError') {
+      return res
+        .status(400)
+        .send({ message: 'Переданы неверные данные', error: error.message });
+    }
+    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+  }
+};
+
+// Обновить аватар пользователя
+module.exports.updateAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { avatar },
+      { new: true, runValidators: true },
+    ).orFail(() => new Error('NotFoundError'));
+
+    return res.status(200).send(user);
+  } catch (error) {
+    if (error.message === 'NotFoundError') {
+      return res
+        .status(404)
+        .send({ message: 'Пользователь по указанному ID не найден' });
+    }
+    if (error.name === 'ValidationError') {
+      return res
+        .status(400)
+        .send({ message: 'Переданы неверные данные', error: error.message });
+    }
+    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+  }
+};

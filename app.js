@@ -11,7 +11,7 @@ const app = express();
 // Временное решение авторизации (добавляется в каждый запрос объект user)
 app.use((req, res, next) => {
   req.user = {
-    _id: '5d8b8592978f8bd833ca8133',
+    _id: '65aa8fb4415916f43987ab48',
   };
 
   next();
