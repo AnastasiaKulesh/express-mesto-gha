@@ -40,6 +40,10 @@ module.exports.deleteCard = async (req, res) => {
 
     return res.status(200).send({ data: card });
   } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).send({ message: 'Передан неверный ID' });
+    }
+
     if (error.message === 'NotFoundError') {
       return res
         .status(404)
