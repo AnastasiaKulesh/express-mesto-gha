@@ -1,13 +1,25 @@
 /* eslint-disable no-console */
+const mongoose = require('mongoose');
 const Card = require('../models/Card');
+
+const {
+  STATUS_SUCCESS,
+  STATUS_CREATED,
+  STATUS_BAD_REQUEST,
+  STATUS_NOT_FOUND,
+  STATUS_SERVER_ERROR,
+  NotFoundError,
+} = require('../constants/errors');
 
 // Получить все карточки
 module.exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
-    return res.status(200).send(cards);
+    return res.status(STATUS_SUCCESS).send(cards);
   } catch (error) {
-    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+    return res
+      .status(STATUS_SERVER_ERROR)
+      .send({ message: 'Ошибка на стороне сервера' });
   }
 };
 
@@ -18,15 +30,17 @@ module.exports.createCard = async (req, res) => {
     const newCard = new Card({ name, link });
     newCard.owner = req.user._id;
 
-    return res.status(200).send(await newCard.save());
+    return res.status(STATUS_CREATED).send(await newCard.save());
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error instanceof mongoose.Error.ValidationError) {
       return res
-        .status(400)
+        .status(STATUS_BAD_REQUEST)
         .send({ message: 'Переданы неверные данные', error: error.message });
     }
 
-    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+    return res
+      .status(STATUS_SERVER_ERROR)
+      .send({ message: 'Ошибка на стороне сервера' });
   }
 };
 
@@ -35,22 +49,26 @@ module.exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     const card = await Card.findByIdAndDelete(cardId).orFail(
-      () => new Error('NotFoundError'),
+      () => new NotFoundError(),
     );
 
-    return res.status(200).send({ data: card });
+    return res.status(STATUS_SUCCESS).send({ data: card });
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res.status(400).send({ message: 'Передан неверный ID' });
+    if (error instanceof mongoose.Error.CastError) {
+      return res
+        .status(STATUS_BAD_REQUEST)
+        .send({ message: 'Передан неверный ID' });
     }
 
-    if (error.message === 'NotFoundError') {
+    if (error instanceof NotFoundError) {
       return res
-        .status(404)
+        .status(STATUS_NOT_FOUND)
         .send({ message: 'Карточка по указанному ID не найдена' });
     }
 
-    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+    return res
+      .status(STATUS_SERVER_ERROR)
+      .send({ message: 'Ошибка на стороне сервера' });
   }
 };
 
@@ -64,21 +82,25 @@ module.exports.setLike = async (req, res) => {
       cardId,
       { $addToSet: { likes: userId } },
       { new: true },
-    ).orFail(() => new Error('NotFoundError'));
+    ).orFail(() => new NotFoundError());
 
-    return res.status(200).send(like);
+    return res.status(STATUS_SUCCESS).send(like);
   } catch (error) {
-    if (error.message === 'NotFoundError') {
+    if (error instanceof NotFoundError) {
       return res
-        .status(404)
+        .status(STATUS_NOT_FOUND)
         .send({ message: 'Карточка по указанному ID не найдена' });
     }
 
-    if (error.name === 'CastError') {
-      return res.status(400).send({ message: 'Передан неверный ID' });
+    if (error instanceof mongoose.Error.CastError) {
+      return res
+        .status(STATUS_BAD_REQUEST)
+        .send({ message: 'Передан неверный ID' });
     }
 
-    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+    return res
+      .status(STATUS_SERVER_ERROR)
+      .send({ message: 'Ошибка на стороне сервера' });
   }
 };
 
@@ -92,20 +114,24 @@ module.exports.deleteLike = async (req, res) => {
       cardId,
       { $pull: { likes: userId } },
       { new: true },
-    ).orFail(() => new Error('NotFoundError'));
+    ).orFail(() => new NotFoundError());
 
-    return res.status(200).send(like);
+    return res.status(STATUS_SUCCESS).send(like);
   } catch (error) {
-    if (error.message === 'NotFoundError') {
+    if (error instanceof NotFoundError) {
       return res
-        .status(404)
+        .status(STATUS_NOT_FOUND)
         .send({ message: 'Карточка по указанному ID не найдена' });
     }
 
-    if (error.name === 'CastError') {
-      return res.status(400).send({ message: 'Передан неверный ID' });
+    if (error instanceof mongoose.Error.CastError) {
+      return res
+        .status(STATUS_BAD_REQUEST)
+        .send({ message: 'Передан неверный ID' });
     }
 
-    return res.status(500).send({ message: 'Ошибка на стороне сервера' });
+    return res
+      .status(STATUS_SERVER_ERROR)
+      .send({ message: 'Ошибка на стороне сервера' });
   }
 };
